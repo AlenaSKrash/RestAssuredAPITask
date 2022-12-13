@@ -37,9 +37,9 @@ public class ReqresTest {
     }
 
     @Test
-    public void successRegTest(){
+    public void successRegTest() {
         Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpec200());
-        Register user = new Register("pistol","eve.holt@reqres.in");
+        Register user = new Register("pistol", "eve.holt@reqres.in");
         SuccessReg successReg = given()
                 .header("Content-type", "application/json")
                 .body(user)
@@ -54,9 +54,9 @@ public class ReqresTest {
     }
 
     @Test
-    public void unSuccessfullReg(){
+    public void unSuccessfullReg() {
         Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpec400());
-        Register user = new Register("","sydney@fife");
+        Register user = new Register("", "sydney@fife");
         UnSuccessReg unSuccessReg = given()
                 .body(user)
                 .when()
@@ -67,5 +67,31 @@ public class ReqresTest {
         //Unsuccessful registration case
         Assert.assertEquals("Missing password", unSuccessReg.getError());
     }
+
+    @Test
+    public void sortedYearsTest() {
+        Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpec200());
+        List<ColorsData> colors = given()
+                .when()
+                .get("api/unknown")
+                .then().log().all()
+                .extract().body().jsonPath().getList("data", ColorsData.class);
+        List<Integer> years = colors.stream().map(ColorsData::getYear).collect(Collectors.toList());
+        List<Integer> sortedYears = years.stream().sorted().collect(Collectors.toList());
+
+        //LIST<RESOURCE> returns sorted years in the ascending order
+        Assert.assertEquals(sortedYears, years);
+    }
+
+    @Test
+    public void deleteUserTest(){
+        //Checking if status is 204 with delete method
+        Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpecUniq(204));
+        given()
+                .when().delete("api/users/2")
+                .then().log().all();
+    }
+
+
 }
 
