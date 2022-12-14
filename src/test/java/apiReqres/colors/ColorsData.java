@@ -1,4 +1,4 @@
-package api;
+package apiReqres.colors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

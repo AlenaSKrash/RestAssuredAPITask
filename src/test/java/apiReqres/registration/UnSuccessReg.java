@@ -1,4 +1,4 @@
-package api;
+package apiReqres.registration;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

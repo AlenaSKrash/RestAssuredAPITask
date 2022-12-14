@@ -1,8 +1,8 @@
-package api;
+package apiReqres.users;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class DataItem{
+public class UserData {
 
 	@JsonProperty("last_name")
 	private String lastName;
