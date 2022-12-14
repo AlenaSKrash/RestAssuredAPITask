@@ -8,6 +8,8 @@ import apiReqres.registration.Register;
 import apiReqres.registration.SuccessReg;
 import apiReqres.registration.UnSuccessReg;
 import apiReqres.specifications.Specifications;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ import static io.restassured.RestAssured.given;
 public class ReqresTestPojo {
     private final static String URL = "https://reqres.in/";
 
+    //GET1
     @Test
     @DisplayName("Names of avatar files contain correct ids of users," +
             "Emails of users end with @reqres.in")
@@ -45,6 +48,53 @@ public class ReqresTestPojo {
             Assertions.assertTrue(avatars.get(i).contains(ids.get(i)));
         }
     }
+
+    //GET2
+    @Test
+    @DisplayName("Users id is 2, email is janet.weaver@reqres.in, name is Janet, last name is Weaver")
+    public void correctUserDetailsTest(){
+        Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpec200());
+        Response response = given()
+                .when()
+                .get("api/users/2")
+                .then().log().all()
+                .extract().response();
+        JsonPath jsonPath = response.jsonPath();
+        Integer id = jsonPath.get("data.id");
+        String email = jsonPath.get("data.email");
+        String firstName = jsonPath.get("data.first_name");
+        String lastName = jsonPath.get("data.last_name");
+        Assertions.assertEquals(2,id);
+        Assertions.assertEquals("janet.weaver@reqres.in", email);
+        Assertions.assertEquals("Janet", firstName);
+        Assertions.assertEquals("Weaver", lastName);
+    }
+
+    //GET3
+    @Test
+    @DisplayName("User not found response is 404")
+    public void userNotFound(){
+        Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpecUniq(404));
+        given().when().get("/api/users/23").then().log().all();
+    }
+
+    //GET4
+    @Test
+    @DisplayName("Returns sorted years in the ascending order")
+    public void sortedYearsTest() {
+        Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpec200());
+        List<ColorsData> colors = given()
+                .when()
+                .get("api/unknown")
+                .then().log().all()
+                .extract().body().jsonPath().getList("data", ColorsData.class);
+        List<Integer> years = colors.stream().map(ColorsData::getYear).collect(Collectors.toList());
+        List<Integer> sortedYears = years.stream().sorted().collect(Collectors.toList());
+
+        //LIST<RESOURCE> returns sorted years in the ascending order
+        Assertions.assertEquals(sortedYears, years);
+    }
+
 
     @Test
     @DisplayName("Successful registration")
@@ -80,21 +130,7 @@ public class ReqresTestPojo {
         Assertions.assertEquals("Missing password", unSuccessReg.getError());
     }
 
-    @Test
-    @DisplayName("Returns sorted years in the ascending order")
-    public void sortedYearsTest() {
-        Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpec200());
-        List<ColorsData> colors = given()
-                .when()
-                .get("api/unknown")
-                .then().log().all()
-                .extract().body().jsonPath().getList("data", ColorsData.class);
-        List<Integer> years = colors.stream().map(ColorsData::getYear).collect(Collectors.toList());
-        List<Integer> sortedYears = years.stream().sorted().collect(Collectors.toList());
 
-        //LIST<RESOURCE> returns sorted years in the ascending order
-        Assertions.assertEquals(sortedYears, years);
-    }
 
     @Test
     @DisplayName("Delete User")
