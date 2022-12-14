@@ -9,6 +9,7 @@ import apiReqres.registration.SuccessReg;
 import apiReqres.registration.UnSuccessReg;
 import apiReqres.specifications.Specifications;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.Clock;
@@ -21,6 +22,8 @@ public class ReqresTestPojo {
     private final static String URL = "https://reqres.in/";
 
     @Test
+    @DisplayName("Names of avatar files contain correct ids of users," +
+            "Emails of users end with @reqres.in")
     public void checkAvatarANdIdTest() {
         Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpec200());
         List<UserData> users = given()
@@ -44,6 +47,7 @@ public class ReqresTestPojo {
     }
 
     @Test
+    @DisplayName("Successful registration")
     public void successRegTest() {
         Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpec200());
         Register user = new Register("pistol", "eve.holt@reqres.in");
@@ -61,6 +65,7 @@ public class ReqresTestPojo {
     }
 
     @Test
+    @DisplayName("Registration is not successful with empty password and returns an error message")
     public void unSuccessfullReg() {
         Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpec400());
         Register user = new Register("", "sydney@fife");
@@ -76,6 +81,7 @@ public class ReqresTestPojo {
     }
 
     @Test
+    @DisplayName("Returns sorted years in the ascending order")
     public void sortedYearsTest() {
         Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpec200());
         List<ColorsData> colors = given()
@@ -91,6 +97,7 @@ public class ReqresTestPojo {
     }
 
     @Test
+    @DisplayName("Delete User")
     public void deleteUserTest(){
 
         //Checking if status is 204 with delete method
@@ -101,6 +108,7 @@ public class ReqresTestPojo {
     }
 
     @Test
+    @DisplayName("Patch/update the user class by adding updatedAt")
     public void timeTest(){
         Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpec200());
         UserTime user = new UserTime("morpheus", "zion resident");
@@ -111,9 +119,11 @@ public class ReqresTestPojo {
                 .then().log().all()
                 .extract().as(UserTimeResponse.class);
         String regex = "(.{5})$";
+
         // REGEX DOESNT WORK FOR CURRENT TIME - NO IDEA WHY
         String currentTime = Clock.systemUTC().instant().toString().replaceAll(regex, "");
         System.out.println(currentTime);
+
         Assertions.assertEquals(currentTime, response.getUpdatedAt().replaceAll(regex, ""));
         System.out.println(response.getUpdatedAt().replaceAll(regex, ""));
     }

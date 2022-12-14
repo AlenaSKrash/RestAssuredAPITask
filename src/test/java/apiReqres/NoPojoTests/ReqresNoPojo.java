@@ -1,6 +1,7 @@
 package apiReqres.NoPojoTests;
 
 import apiReqres.specifications.Specifications;
+import groovy.xml.StreamingDOMBuilder;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.junit.Assert;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -76,6 +78,25 @@ public class ReqresNoPojo {
         JsonPath jsonPath = response.jsonPath();
         String error = jsonPath.get("error");
         Assertions.assertEquals("Missing password", error);
+    }
+
+    @Test
+    public void sortedYearListNoPojoTest(){
+        Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpec200());
+        Response response = given()
+                .when()
+                .get("api/unknown")
+                .then().log().all()
+                .body("data.color", notNullValue())
+                .body("data.id", notNullValue())
+                .body("data.year", notNullValue())
+                .extract().response();
+        JsonPath jsonPath = response.jsonPath();
+        List<Integer> years = jsonPath.get("data.year");
+        System.out.println(years);
+        List<Integer> sortedYears = years.stream().sorted().collect(Collectors.toList());
+        System.out.println(sortedYears);
+        Assertions.assertEquals(sortedYears, years);
     }
 
 }
