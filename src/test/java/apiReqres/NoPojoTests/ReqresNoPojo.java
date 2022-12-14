@@ -98,5 +98,4 @@ public class ReqresNoPojo {
         System.out.println(sortedYears);
         Assertions.assertEquals(sortedYears, years);
     }
-
 }
