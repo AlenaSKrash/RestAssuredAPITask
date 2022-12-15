@@ -1,10 +1,8 @@
 package apiReqres.NoPojoTests;
 
 import apiReqres.specifications.Specifications;
-import groovy.xml.StreamingDOMBuilder;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

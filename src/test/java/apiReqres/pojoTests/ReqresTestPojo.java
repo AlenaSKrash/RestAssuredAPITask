@@ -94,8 +94,39 @@ public class ReqresTestPojo {
         //LIST<RESOURCE> returns sorted years in the ascending order
         Assertions.assertEquals(sortedYears, years);
     }
+    
+    //GET5
+    @Test
+    @DisplayName("Resource's id is 2, name is 'fuchsia rose', year is 2001, color is '#C74375'")
+    public void dataOfTheColorSourceTest(){
+        Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpec200());
+        Response response = given()
+                .when()
+                .get("api/unknown/2")
+                .then().log().all()
+                .extract().response();
+        JsonPath jsonPath = response.jsonPath();
+        System.out.println(response);
+        Integer id = jsonPath.get("data.id");
+        String name = jsonPath.get("data.name");
+        String color = jsonPath.get("data.color");
+        Integer year = jsonPath.get("data.year");
+        Assertions.assertEquals(2,id);
+        Assertions.assertEquals("fuchsia rose", name);
+        Assertions.assertEquals("#C74375", color);
+        Assertions.assertEquals(2001, year);
+    }
 
+    //GET6
+    @Test
+    @DisplayName("Resource with id 23 is not found and returns 404 error")
+    public void resourceNotFound(){
+        Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpecUniq(404));
+        given().when().get("api/unknown/23")
+                .then().log().all();
+    }
 
+    //POST2
     @Test
     @DisplayName("Successful registration")
     public void successRegTest() {
@@ -114,6 +145,7 @@ public class ReqresTestPojo {
         Assertions.assertEquals("QpwL5tke4Pnpja7X4", successReg.getToken());
     }
 
+    //POST3
     @Test
     @DisplayName("Registration is not successful with empty password and returns an error message")
     public void unSuccessfullReg() {
